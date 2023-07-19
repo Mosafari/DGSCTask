@@ -1,8 +1,8 @@
 # import
-
+from fastapi import FastAPI
 
 # instantiate the FastAPI object
-
+app = FastAPI()
 
 # initialize the MongoClient
 
@@ -11,7 +11,9 @@
 
 
 # signup
-
+@app.post("/signup")
+def signup(username: str, password: str):
+    return {"message": "Signup successful"}
 
 # Login
 
