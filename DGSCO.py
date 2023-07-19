@@ -107,7 +107,23 @@ def twitterlogin(username: str, password: str, id : str):
     return {"message": data["message"], "_id": id}
 
 # logout from twitter
-
+@app.post("/twitterlogout")
+def logouttwitter():
+    global driver
+    if driver is  None:
+        return {"message": "You'r not logged in!"}
+    else: 
+        if driver.find_elements(By.CSS_SELECTOR, "a.r-1habvwh:nth-child(1) > div:nth-child(1)"): # if its on home page
+            time.sleep(5)
+            # click the menu to logout
+            driver.find_element(By.CSS_SELECTOR, "div.r-1q142lx:nth-child(1) > div:nth-child(1)").click()
+            driver.find_element(By.CSS_SELECTOR, ".r-usiww2 > div:nth-child(1) > div:nth-child(1)").click() 
+            driver.find_element(By.CSS_SELECTOR, "a.r-18u37iz:nth-child(3) > div:nth-child(1) > div:nth-child(1)").click()
+            if driver.find_element(By.CSS_SELECTOR, "div.css-18t94o4:nth-child(1) > div:nth-child(1)"):
+                driver.find_element(By.CSS_SELECTOR, "div.css-18t94o4:nth-child(1) > div:nth-child(1)").click()
+                driver.close()
+            driver = None
+            return {"message": "Successfully closed"}
 
 # Find all Followers
 
