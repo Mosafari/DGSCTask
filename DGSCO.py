@@ -47,6 +47,14 @@ def signup(username: str, password: str):
     return {"message": "Signup successful", "_id": user_id}
 
 # Login
+@app.post("/login")
+def login(username: str, password: str):
+    # Find the user and check user with password
+    user = UserModel.passcheck(username, password)
+    if user:
+        return {"message": "Login successful", "_id": str(user.get("_id"))}
+    else:
+        raise HTTPException(status_code=401, detail="Invalid username or password")
 
 
 # Twitter Login
