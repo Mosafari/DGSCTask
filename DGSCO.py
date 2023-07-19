@@ -58,7 +58,53 @@ def login(username: str, password: str):
 
 
 # Twitter Login
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
+from selenium import webdriver as wd
+import os
+from selenium.webdriver.common.by import By   
+import time
+def logintwitter(username: str, password: str):
+    global driver
+    # initialize the driver
+    path = os.getcwd() + '\geckodriver.exe'
+    ser = Service(r'{}'.format(path))
+    options = Options()
+    options.headless = True
+    driver = wd.Firefox(options=options,  service=ser)#
+    driver.implicitly_wait(20)
+    URL = "https://twitter.com/"
+    driver.get(URL)
+    time.sleep(5)
+    # enter username and password
+    driver.find_element(By.CSS_SELECTOR, ".r-30o5oe").send_keys(username)
+    driver.find_element(By.CSS_SELECTOR, "div.css-18t94o4:nth-child(6) > div:nth-child(1)").click()
+    time.sleep(5)
+    driver.find_element(By.CSS_SELECTOR, ".r-homxoj").send_keys(password)
+    driver.find_element(By.CSS_SELECTOR, ".r-19yznuf").click()
+    if driver.find_elements(By.CSS_SELECTOR, "a.r-1habvwh:nth-child(1) > div:nth-child(1)"): # if its on home page
+        return True
+    else: return False
+    
+@app.post("/twitterlogin")
+def twitterlogin(username: str, password: str, id : str):
+    data = dict()
+    login = logintwitter(username, password)
+    if login:
+        data['message'] = "Add successful"
+    else:
+        # if it doesn't exist close the session 
+        driver.close()
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    if data['message'] == "Add successful" :
+        collection = db["users"]
+        filter = {"_id": ObjectId(id)}
+        update = {"$set": {"Tusername": username, "Tpassword": password}}
 
+        # Update the record
+        collection.update_one(filter, update)
+
+    return {"message": data["message"], "_id": id}
 
 # logout from twitter
 
