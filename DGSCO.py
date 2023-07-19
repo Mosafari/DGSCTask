@@ -126,6 +126,51 @@ def logouttwitter():
             return {"message": "Successfully closed"}
 
 # Find all Followers
+from bs4 import BeautifulSoup
+from selenium.webdriver.common.keys import Keys   
+@app.post("/followers")
+def followers(id : str, username : str):
+    if not driver.find_elements(By.CSS_SELECTOR, "a.r-1habvwh:nth-child(1) > div:nth-child(1)"): # if its on home page
+        return {"message": "First Login!"}
+    else:
+        # Find the user
+        user = UserModel.find_user_by_id(id)
+        driver.get(f"https://twitter.com/{username}/followers")
+        for _ in range(10):
+            driver.find_element(By.TAG_NAME, "body").send_keys(Keys.END) # scroll to end of body
+            time.sleep(1)  # Add a small delay to wait for the content to load
+        # find the section for the followers
+        section = driver.find_element(By.CSS_SELECTOR, "section.css-1dbjc4n:nth-child(3)").text
+        followers = [i for i in section.split('\n') if '@' in i]
+        return {f'{username}_followers': followers}
+    # or this way ( with twitter api)
+    # if you have a pro account
+    # import tweepy
 
+    # # Authenticate to Twitter
+    # auth = tweepy.OAuthHandler("CONSUMER_KEY", "CONSUMER_SECRET")
+    # auth.set_access_token("ACCESS_TOKEN", "ACCESS_TOKEN_SECRET")
+
+    # api = tweepy.API(auth)
+
+    # try:
+    #     api.verify_credentials()
+    #     print("Authentication OK")
+    # except:
+    #     print("Error during authentication")
+    # print(user["Tusername"])
+    # username = user["Tusername"]
+    # followers = api.get_follower_ids(screen_name="bi3da021")
+    # for follower_id in followers:
+    #     follower = api.get_user(user_id=follower_id)
+    #     print(follower.screen_name)
+    # testuserdata = api.get_followers(user_id="bi3da021")
+    # print(testuserdata)
+    # for j in testuserdata.followers():
+    #     print(j.name)
+    # userdata = api.get_followers(user_id=username)
+    # print(userdata)
+    # for i in userdata.followers():
+    #     print(i.name)
 
 # Run App
