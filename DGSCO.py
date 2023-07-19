@@ -1,6 +1,7 @@
 # import
 from fastapi import FastAPI
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 # instantiate the FastAPI object
 app = FastAPI()
@@ -35,7 +36,15 @@ class UserModel:
 # signup
 @app.post("/signup")
 def signup(username: str, password: str):
-    return {"message": "Signup successful"}
+    # Check if username already exists
+    existing_user = UserModel.find_user(username)
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username already exists")
+
+    # Create a new user
+    user_id = UserModel.create_user(username, password)
+
+    return {"message": "Signup successful", "_id": user_id}
 
 # Login
 
